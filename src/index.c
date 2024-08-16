@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdint.h>
 
 int
 writeDeps(char *c, size_t size)
@@ -40,6 +41,8 @@ ugh:
 int
 main(int argc, char **argv)
 {
+	uint64_t metadataVersion = 0;
+
 	size_t packageNameLength = 0;
 	size_t packageVersionLength = 0;
 	size_t packageDescriptionLength = 0;
@@ -55,6 +58,8 @@ main(int argc, char **argv)
 	packageVersionLength = strlen(argv[2])+1;
 	packageDescriptionLength = strlen(argv[3])+1;
 	packageDependenciesLength = strlen(argv[4]);
+
+	write(1, &metadataVersion, sizeof(metadataVersion));
 
 	write(1, argv[1], packageNameLength);
 	write(1, argv[2], packageVersionLength);
