@@ -18,7 +18,7 @@ writeDeps(char *c, size_t size)
 			write(1, &"\0", 1);
 			break;
 		case '\0':
-			write(1, &"\1", 1);
+			write(1, &"\0\1", 2);
 			i++;
 			goto ugh;
 			break;
