@@ -60,4 +60,6 @@ main(int argc, char **argv)
 	write(1, argv[2], packageVersionLength);
 	write(1, argv[3], packageDescriptionLength);
 	writeDeps(argv[4], packageDescriptionLength);
+
+	return 0;
 }
