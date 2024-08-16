@@ -1,54 +1,63 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
-long
-printAndSanitise(char *c)
+int
+writeDeps(char *c, size_t size)
 {
-	long i = 0;
+	int i = 0;
+	char d = 0;
 
 	while (1) {
-		switch (c[i]) {
+		d = c[i];
+
+		switch (d)
+		{
+		case ' ':
+			write(1, &"\0", 1);
+			break;
 		case '\0':
-			goto ret;
-		case '"':
-			write(1, &"\\\"", 2);
-			goto cont;
+			write(1, &"\1", 1);
+			i++;
+			goto ugh;
+			break;
 		default:
-			write(1, &c[i], 1);
-			/* fall-through */
+			write(1, &d, 1);
 		}
 
-	cont:
 		i++;
+		if (i == size-1) {
+			break;
+		}
 	}
 
-ret:
+	goto ugh;
+
+ugh:
 	return i;
 }
 
 int
 main(int argc, char **argv)
 {
-	char c = 0;
+	size_t packageNameLength = 0;
+	size_t packageVersionLength = 0;
+	size_t packageDescriptionLength = 0;
+	size_t packageDependenciesLength = 0;
 
 	if (argc != 5) {
-		dprintf(2, "Too few/much arguments received! Expected 5, received %d.\n", argc);
+		fprintf(stderr, "Invalid amount of arguments received! Expected 5, received %d!\n", argc);
 
 		return 1;
 	}
 
-	dprintf(1, "{");
-	dprintf(1, "\"pkgname\": \"");
-	printAndSanitise(argv[1]);
-	dprintf(1, "\",\"pkgver\":\"");
-	printAndSanitise(argv[2]);
-	dprintf(1, "\",\"pkgdesc\":\"");
-	printAndSanitise(argv[3]);
-	dprintf(1, "\",\"pkgdeps\":\"");
-	printAndSanitise(argv[4]);
-	dprintf(1, "\"");
-	dprintf(1, "}\n");
+	packageNameLength = strlen(argv[1])+1;
+	packageVersionLength = strlen(argv[2])+1;
+	packageDescriptionLength = strlen(argv[3])+1;
+	packageDependenciesLength = strlen(argv[4]);
 
-	return 0;
+	write(1, argv[1], packageNameLength);
+	write(1, argv[2], packageVersionLength);
+	write(1, argv[3], packageDescriptionLength);
+	writeDeps(argv[4], packageDescriptionLength);
 }
-
